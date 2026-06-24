@@ -1,6 +1,6 @@
 using TA.DAL.Enums;
 
-namespace TA.DAL.Entities;
+namespace TA.DAL.Entities.Identity;
 
 public class User : BaseEntity
 {
