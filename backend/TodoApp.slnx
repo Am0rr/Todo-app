@@ -1,0 +1,6 @@
+<Solution>
+  <Project Path="TA.API/TA.API.csproj" />
+  <Project Path="TA.BLL/TA.BLL.csproj" />
+  <Project Path="TA.DAL/TA.DAL.csproj" />
+  <Project Path="TA.Interfaces/TA.Interfaces.csproj" />
+</Solution>

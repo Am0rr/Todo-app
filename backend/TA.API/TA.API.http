@@ -1,0 +1,6 @@
+@TA.PL_HostAddress = http://localhost:5215
+
+GET {{TA.PL_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
