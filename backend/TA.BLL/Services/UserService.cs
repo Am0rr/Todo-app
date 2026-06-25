@@ -5,6 +5,7 @@ using TA.BLL.DTOs.Identity;
 using TA.DAL.Entities.Identity;
 using TA.DAL.Enums;
 using Microsoft.EntityFrameworkCore;
+using TA.BLL.Exceptions;
 
 namespace TA.BLL.Services;
 
@@ -27,10 +28,10 @@ public class UserService : BaseService, IUserService
         Validate(request);
 
         if (await _unitOfWork.Users.Query().AnyAsync(u => u.Username == request.Username, cancellationToken))
-            throw new InvalidOperationException("This username is already taken.");
+            throw new ConflictException("This username is already taken.");
 
         if (await _unitOfWork.Users.Query().AnyAsync(u => u.Email == request.Email, cancellationToken))
-            throw new InvalidOperationException("Account with this email address already exists.");
+            throw new ConflictException("Account with this email address already exists.");
 
         string passwordHash = BCrypt.Net.BCrypt.HashPassword(request.Password);
 
@@ -51,13 +52,13 @@ public class UserService : BaseService, IUserService
     {
         Validate(request);
         var user = await _unitOfWork.Users.GetByIdAsync(id, cancellationToken)
-            ?? throw new KeyNotFoundException($"User with Id {id} not found");
+            ?? throw new NotFoundException($"User with Id {id} not found");
 
         if (request.Username != null)
         {
             if (await _unitOfWork.Users.Query()
                 .AnyAsync(u => u.Username == request.Username && u.Id != id, cancellationToken))
-                throw new InvalidOperationException("This username is already taken.");
+                throw new ConflictException("This username is already taken.");
 
             user.ChangeUsername(request.Username);
         }
@@ -65,7 +66,7 @@ public class UserService : BaseService, IUserService
         if (request.Email != null)
         {
             if (await _unitOfWork.Users.Query().AnyAsync(u => u.Email == request.Email, cancellationToken))
-                throw new InvalidOperationException("Account with this email address already exists.");
+                throw new ConflictException("Account with this email address already exists.");
 
             user.ChangeEmail(request.Email);
         }
@@ -82,7 +83,7 @@ public class UserService : BaseService, IUserService
     public async Task DeleteAsync(Guid id, CancellationToken cancellationToken)
     {
         var user = await _unitOfWork.Users.GetByIdAsync(id, cancellationToken)
-            ?? throw new KeyNotFoundException($"User with Id {id} not found");
+            ?? throw new NotFoundException($"User with Id {id} not found");
 
         _unitOfWork.Users.Delete(user);
         await _unitOfWork.SaveChangesAsync(cancellationToken);
@@ -91,7 +92,7 @@ public class UserService : BaseService, IUserService
     public async Task<UserResponse> GetByIdAsync(Guid id, CancellationToken cancellationToken)
     {
         var user = await _unitOfWork.Users.GetByIdAsync(id, cancellationToken)
-            ?? throw new KeyNotFoundException($"User with ID {id} not found.");
+            ?? throw new NotFoundException($"User with ID {id} not found.");
 
         return _mapper.Map<UserResponse>(user);
     }
@@ -99,7 +100,7 @@ public class UserService : BaseService, IUserService
     public async Task<UserResponse> GetByEmailAsync(string email, CancellationToken cancellationToken)
     {
         var user = await _unitOfWork.Users.GetByEmailAsync(email, cancellationToken)
-            ?? throw new KeyNotFoundException($"User with email {email} not found.");
+            ?? throw new NotFoundException($"User with email {email} not found.");
 
         return _mapper.Map<UserResponse>(user);
     }
