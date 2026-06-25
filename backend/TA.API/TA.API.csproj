@@ -13,7 +13,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\TA.Interfaces\TA.Interfaces.csproj" />
     <ProjectReference Include="..\TA.BLL\TA.BLL.csproj" />
     <ProjectReference Include="..\TA.DAL\TA.DAL.csproj" />
   </ItemGroup>
