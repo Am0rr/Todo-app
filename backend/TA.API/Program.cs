@@ -1,5 +1,8 @@
 using DotNetEnv;
+using Microsoft.EntityFrameworkCore;
 using System.Text.Json.Serialization;
+using TA.DAL;
+using TA.DAL.Persistence;
 
 Env.TraversePath().Load();
 
@@ -31,7 +34,7 @@ builder.Services.AddCors(options =>
 
 builder.Services.AddEndpointsApiExplorer();
 
-// builder.Services.AddDataAccess(builder.Configuration);
+builder.Services.AddDataAccess(builder.Configuration);
 // builder.Services.AddApplication();
 // builder.Services.AddJwtAuthentication(builder.Configuration);
 
@@ -41,17 +44,16 @@ app.UseCors("AllowFrontend");
 
 // app.UseMiddleware<GlobalExceptionMiddleware>();
 
-
 using (var scope = app.Services.CreateScope())
 {
     var services = scope.ServiceProvider;
-    // var context = services.GetRequiredService<DbContext>();
+    var context = services.GetRequiredService<AppDbContext>();
     var logger = services.GetRequiredService<ILogger<Program>>();
 
     try
     {
         logger.LogInformation("Starting database migration...");
-        // await context.Database.MigrateAsync();
+        await context.Database.MigrateAsync();
         logger.LogInformation("Database migrated successfully.");
     }
     catch (Exception ex)
