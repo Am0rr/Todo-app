@@ -8,7 +8,7 @@ public class Category : BaseEntity
 
     protected Category() { }
 
-    public Category(string name, string description, Guid userId)
+    public Category(string name, string? description, Guid userId)
     {
         Name = name;
         Description = description;
