@@ -1,7 +1,7 @@
 using FluentValidation;
 using TA.BLL.DTOs.Tasks;
 
-namespace TA.BLL.Validators.Category;
+namespace TA.BLL.Validators.Tasks;
 
 public class CreateCategoryValidator : AbstractValidator<CreateCategoryRequest>
 {
@@ -15,8 +15,5 @@ public class CreateCategoryValidator : AbstractValidator<CreateCategoryRequest>
             .NotEmpty().WithMessage("Category description cannot be empty.")
             .MaximumLength(1000).WithMessage("Category description must not exceed 1000 characters.")
             .When(c => c.Description != null);
-
-        RuleFor(c => c.UserId)
-            .NotEmpty().WithMessage("User ID is required");
     }
 }

@@ -4,6 +4,5 @@ public record UpdateTaskRequest(
     string? Title,
     string? Description,
     Guid? CategoryId,
-    Guid? UserId,
     string? Status
 );
