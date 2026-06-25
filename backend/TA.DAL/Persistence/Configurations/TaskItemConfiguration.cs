@@ -24,8 +24,6 @@ public class TaskItemConfiguration : IEntityTypeConfiguration<TaskItem>
             .HasConversion<string>()
             .HasMaxLength(20);
 
-        builder.HasIndex(ti => ti.UserId);
-        builder.HasIndex(ti => ti.CategoryId);
         builder.HasIndex(ti => ti.Status);
 
         builder.HasOne<Category>()

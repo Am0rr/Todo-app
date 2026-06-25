@@ -18,7 +18,6 @@ public class RefreshTokenConfiguration : IEntityTypeConfiguration<RefreshToken>
         builder.Property(rt => rt.CreatedAt).IsRequired();
 
         builder.HasIndex(rt => rt.Token).IsUnique();
-        builder.HasIndex(rt => rt.UserId);
 
         builder.HasOne<User>()
             .WithMany()
