@@ -1,6 +1,8 @@
 using DotNetEnv;
 using Microsoft.EntityFrameworkCore;
 using System.Text.Json.Serialization;
+using TA.API.Infrastructure.Extensions;
+using TA.BLL;
 using TA.DAL;
 using TA.DAL.Persistence;
 
@@ -35,8 +37,8 @@ builder.Services.AddCors(options =>
 builder.Services.AddEndpointsApiExplorer();
 
 builder.Services.AddDataAccess(builder.Configuration);
-// builder.Services.AddApplication();
-// builder.Services.AddJwtAuthentication(builder.Configuration);
+builder.Services.AddApplication();
+builder.Services.AddJwtAuthentication(builder.Configuration);
 
 var app = builder.Build();
 
