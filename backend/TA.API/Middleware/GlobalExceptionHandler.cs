@@ -68,6 +68,7 @@ public class GlobalExceptionHandler
 
         }
 
+        context.Response.StatusCode = statusCode;
         return context.Response.WriteAsync(JsonSerializer.Serialize(response));
     }
 
