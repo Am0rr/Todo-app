@@ -9,21 +9,15 @@ namespace TA.API.Controllers;
 [ApiController]
 [Route("api/[controller]")]
 [Authorize]
-public class CategoriesController : ControllerBase
+public class CategoriesController(ICategoryService categoryService) : ControllerBase
 {
-    private readonly ICategoryService _categoryService;
-
-    public CategoriesController(ICategoryService categoryService)
-    {
-        _categoryService = categoryService;
-    }
 
     [HttpPost]
     public async Task<ActionResult<CategoryResponse>> Create([FromBody] CreateCategoryRequest request, CancellationToken cancellationToken)
     {
         var userId = Guid.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
 
-        var response = await _categoryService.CreateAsync(userId, request, cancellationToken);
+        var response = await categoryService.CreateAsync(userId, request, cancellationToken);
 
         return CreatedAtAction(nameof(GetById), new { id = response.Id }, response);
     }
@@ -35,7 +29,7 @@ public class CategoriesController : ControllerBase
 
         var role = User.FindFirstValue(ClaimTypes.Role)!;
 
-        var category = await _categoryService.GetByIdAsync(id, userId, role, cancellationToken);
+        var category = await categoryService.GetByIdAsync(id, userId, role, cancellationToken);
 
         return Ok(category);
     }
@@ -47,7 +41,7 @@ public class CategoriesController : ControllerBase
 
         var role = User.FindFirstValue(ClaimTypes.Role)!;
 
-        var categories = await _categoryService.GetAllAsync(userId, role, cancellationToken);
+        var categories = await categoryService.GetAllAsync(userId, role, cancellationToken);
 
         return Ok(categories);
     }
@@ -59,7 +53,7 @@ public class CategoriesController : ControllerBase
 
         var role = User.FindFirstValue(ClaimTypes.Role)!;
 
-        await _categoryService.UpdateAsync(id, userId, role, request, cancellationToken);
+        await categoryService.UpdateAsync(id, userId, role, request, cancellationToken);
 
         return NoContent();
     }
@@ -71,7 +65,7 @@ public class CategoriesController : ControllerBase
 
         var role = User.FindFirstValue(ClaimTypes.Role)!;
 
-        await _categoryService.DeleteAsync(id, userId, role, cancellationToken);
+        await categoryService.DeleteAsync(id, userId, role, cancellationToken);
 
         return NoContent();
     }
