@@ -2,6 +2,7 @@ using DotNetEnv;
 using Microsoft.EntityFrameworkCore;
 using System.Text.Json.Serialization;
 using TA.API.Infrastructure.Extensions;
+using TA.API.Middleware;
 using TA.BLL;
 using TA.DAL;
 using TA.DAL.Persistence;
@@ -44,7 +45,7 @@ var app = builder.Build();
 
 app.UseCors("AllowFrontend");
 
-// app.UseMiddleware<GlobalExceptionMiddleware>();
+app.UseMiddleware<GlobalExceptionHandler>();
 
 using (var scope = app.Services.CreateScope())
 {
