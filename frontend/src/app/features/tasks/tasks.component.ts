@@ -58,4 +58,10 @@ export class TasksComponent implements OnInit {
   loadTasks() {
     this.filterSubject.next(this.filterSubject.value);
   }
+
+  deleteTask(id: string) {
+    this.taskService.delete(id).subscribe({
+      next: () => this.loadTasks(),
+    });
+  }
 }

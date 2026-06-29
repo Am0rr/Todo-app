@@ -76,7 +76,9 @@
               >
                 {{ task.status }}
               </span>
-              <button class="text-gray-400 hover:text-red-500">✕</button>
+              <button (click)="deleteTask(task.id)" class="text-gray-400 hover:text-red-500">
+                ✕
+              </button>
             </div>
           }
         }
