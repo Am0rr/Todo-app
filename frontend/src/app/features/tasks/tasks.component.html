@@ -31,9 +31,9 @@
     </div>
 
     <div class="px-6 py-4 bg-white border-b flex gap-4">
-      <input type="text" placeholder="Search tasks..."
+      <input type="text" (input)="onSearch($event)" placeholder="Search tasks..."
         class="flex-1 border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500" />
-      <select class="border border-gray-300 rounded-md px-3 py-2 focus:outline-none">
+      <select (change)="onStatusChange($event)" class="border border-gray-300 rounded-md px-3 py-2 focus:outline-none">
         <option value="">All Statuses</option>
         <option value="Todo">Todo</option>
         <option value="InProgress">In Progress</option>
