@@ -5,7 +5,15 @@ import { CategoryResponse } from '../../core/models/category.model';
 import { TaskService } from '../../core/services/task.service';
 import { CategoryService } from '../../core/services/category.service';
 import { AsyncPipe } from '@angular/common';
-import { BehaviorSubject, debounceTime, Observable, shareReplay, switchMap } from 'rxjs';
+import {
+  BehaviorSubject,
+  debounceTime,
+  distinctUntilChanged,
+  Observable,
+  shareReplay,
+  Subject,
+  switchMap,
+} from 'rxjs';
 import { NavbarComponent } from '../../shared/components/navbar/navbar.component';
 import { LucideAngularModule, List, Folder, Plus } from 'lucide-angular';
 
@@ -32,11 +40,34 @@ export class TasksComponent implements OnInit {
     pageSize: 10,
   });
 
+  private searchSubject = new Subject<string | undefined>();
+
+  showAddTaskModal = false;
+  newTask = {
+    title: '',
+    description: '',
+    categoryId: '',
+    status: 'Todo' as TaskItemStatus,
+  };
+
+  showAddCategoryModal = false;
+  newCategory = {
+    name: '',
+    description: '',
+  };
+
   ngOnInit() {
     this.categories$ = this.categoryService.getAll().pipe(shareReplay(1));
 
+    this.searchSubject.pipe(debounceTime(300), distinctUntilChanged()).subscribe((searchTerm) => {
+      this.filterSubject.next({
+        ...this.filterSubject.value,
+        searchTerm,
+        pageNumber: 1,
+      });
+    });
+
     this.tasks$ = this.filterSubject.pipe(
-      debounceTime(300),
       switchMap((filter) => this.taskService.getPaged(filter)),
       shareReplay(1),
     );
@@ -80,6 +111,67 @@ export class TasksComponent implements OnInit {
       ...this.filterSubject.value,
       categoryId: categoryId ?? undefined,
       pageNumber: 1,
+    });
+  }
+
+  openAddTaskModal() {
+    this.showAddTaskModal = true;
+  }
+
+  closeAddTaskModal() {
+    this.showAddTaskModal = false;
+    this.newTask = { title: '', description: '', categoryId: '', status: 'Todo' };
+  }
+
+  addTask() {
+    this.taskService
+      .create({
+        title: this.newTask.title,
+        description: this.newTask.description || undefined,
+        categoryId: this.newTask.categoryId || undefined,
+        status: this.newTask.status,
+      })
+      .subscribe({
+        next: () => {
+          this.closeAddTaskModal();
+          this.loadTasks();
+        },
+      });
+  }
+
+  openAddCategoryModal() {
+    this.showAddCategoryModal = true;
+  }
+
+  closeAddCategoryModal() {
+    this.showAddCategoryModal = false;
+    this.newCategory = { name: '', description: '' };
+  }
+
+  addCategory() {
+    this.categoryService
+      .create({
+        name: this.newCategory.name,
+        description: this.newCategory.description || undefined,
+      })
+      .subscribe({
+        next: () => {
+          this.closeAddCategoryModal();
+          this.categories$ = this.categoryService.getAll().pipe(shareReplay(1));
+        },
+      });
+  }
+
+  deleteCategory(id: string, event: Event) {
+    event.stopPropagation();
+
+    this.categoryService.delete(id).subscribe({
+      next: () => {
+        this.categories$ = this.categoryService.getAll().pipe(shareReplay(1));
+        if (this.selectedCategoryId === id) {
+          this.filterByCategory(null);
+        }
+      },
     });
   }
 }

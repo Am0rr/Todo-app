@@ -24,21 +24,37 @@
             @for (category of categories; track category.id) {
               <li
                 (click)="filterByCategory(category.id, category.name)"
-                class="px-3 py-2 rounded-md cursor-pointer"
+                class="px-3 py-2 rounded-md cursor-pointer flex items-center justify-between group transition"
                 [class.bg-blue-50]="selectedCategoryId === category.id"
                 [class.text-blue-600]="selectedCategoryId === category.id"
                 [class.font-medium]="selectedCategoryId === category.id"
                 [class.text-gray-700]="selectedCategoryId !== category.id"
+                [class.hover:bg-gray-100]="selectedCategoryId !== category.id"
               >
-                <lucide-icon [img]="Folder" class="w-4 h-4 mr-2 inline"></lucide-icon>
-                {{ category.name }}
+                <div class="flex items-center min-w-0">
+                  <lucide-icon [img]="Folder" class="w-4 h-4 mr-2 shrink-0"></lucide-icon>
+                  <span class="truncate">{{ category.name }}</span>
+                </div>
+
+                <button
+                  (click)="deleteCategory(category.id, $event)"
+                  class="opacity-0 group-hover:opacity-100 text-gray-400 hover:text-red-500 transition-opacity px-1 shrink-0"
+                  title="Delete category"
+                >
+                  ✕
+                </button>
               </li>
             }
           }
         </ul>
       </nav>
       <div class="p-4">
-        <button class="w-full text-left text-blue-600 hover:text-blue-700">+ New List</button>
+        <button
+          (click)="openAddCategoryModal()"
+          class="w-full text-left text-blue-600 hover:text-blue-700"
+        >
+          + New Category
+        </button>
       </div>
     </div>
 
@@ -46,7 +62,10 @@
     <div class="flex-1 flex flex-col overflow-hidden">
       <div class="h-16 bg-white px-6 border-b border-gray-200 flex items-center justify-between">
         <h1 class="text-xl font-semibold text-gray-800">{{ selectedCategoryName }}</h1>
-        <button class="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700">
+        <button
+          (click)="openAddTaskModal()"
+          class="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700"
+        >
           + Add Task
         </button>
       </div>
@@ -121,3 +140,111 @@
     </div>
   </div>
 </div>
+
+@if (showAddTaskModal) {
+  <div class="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50">
+    <div class="bg-white rounded-lg shadow-xl p-6 w-full max-w-md">
+      <h2 class="text-lg font-semibold mb-4">New Task</h2>
+
+      <div class="mb-4">
+        <label class="block text-sm font-medium text-gray-700 mb-1">Title</label>
+        <input
+          type="text"
+          [(ngModel)]="newTask.title"
+          placeholder="Task title"
+          class="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+        />
+      </div>
+
+      <div class="mb-4">
+        <label class="block text-sm font-medium text-gray-700 mb-1">Description</label>
+        <textarea
+          [(ngModel)]="newTask.description"
+          placeholder="Description (optional)"
+          class="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 h-24 resize-none"
+        ></textarea>
+      </div>
+
+      <div class="mb-4">
+        <label class="block text-sm font-medium text-gray-700 mb-1">Category</label>
+        <select
+          [(ngModel)]="newTask.categoryId"
+          class="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none"
+        >
+          <option value="">No category</option>
+          @if (categories$ | async; as categories) {
+            @for (category of categories; track category.id) {
+              <option [value]="category.id">{{ category.name }}</option>
+            }
+          }
+        </select>
+      </div>
+
+      <div class="mb-6">
+        <label class="block text-sm font-medium text-gray-700 mb-1">Status</label>
+        <select
+          [(ngModel)]="newTask.status"
+          class="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none"
+        >
+          <option value="Todo">Todo</option>
+          <option value="InProgress">In Progress</option>
+          <option value="Done">Done</option>
+        </select>
+      </div>
+
+      <div class="flex gap-3 justify-end">
+        <button (click)="closeAddTaskModal()" class="px-4 py-2 text-gray-600 hover:text-gray-800">
+          Cancel
+        </button>
+        <button
+          (click)="addTask()"
+          class="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700"
+        >
+          Add Task
+        </button>
+      </div>
+    </div>
+  </div>
+}
+
+@if (showAddCategoryModal) {
+  <div class="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50">
+    <div class="bg-white rounded-lg shadow-xl p-6 w-full max-w-md">
+      <h2 class="text-lg font-semibold mb-4">New Category</h2>
+
+      <div class="mb-4">
+        <label class="block text-sm font-medium text-gray-700 mb-1">Name</label>
+        <input
+          type="text"
+          [(ngModel)]="newCategory.name"
+          placeholder="Category name"
+          class="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+        />
+      </div>
+
+      <div class="mb-6">
+        <label class="block text-sm font-medium text-gray-700 mb-1">Description</label>
+        <textarea
+          [(ngModel)]="newCategory.description"
+          placeholder="Description (optional)"
+          class="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 h-24 resize-none"
+        ></textarea>
+      </div>
+
+      <div class="flex gap-3 justify-end">
+        <button
+          (click)="closeAddCategoryModal()"
+          class="px-4 py-2 text-gray-600 hover:text-gray-800"
+        >
+          Cancel
+        </button>
+        <button
+          (click)="addCategory()"
+          class="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700"
+        >
+          Add
+        </button>
+      </div>
+    </div>
+  </div>
+}
