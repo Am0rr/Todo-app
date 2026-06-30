@@ -40,6 +40,7 @@ export class TasksComponent implements OnInit {
   showTaskModal = false;
 
   private filterSubject = new BehaviorSubject<TaskFilterModel>({ pageNumber: 1, pageSize: 10 });
+  private categoriesSubject = new BehaviorSubject<CategoryResponse[]>([]);
 
   constructor(
     private taskService: TaskService,
@@ -47,7 +48,9 @@ export class TasksComponent implements OnInit {
   ) {}
 
   ngOnInit() {
-    this.categories$ = this.categoryService.getAll().pipe(shareReplay(1));
+    this.categories$ = this.categoriesSubject.asObservable();
+    this.reloadCategories();
+
     this.tasks$ = this.filterSubject.pipe(
       switchMap((filter) => this.taskService.getPaged(filter)),
       shareReplay(1),
@@ -121,20 +124,19 @@ export class TasksComponent implements OnInit {
     this.taskService.update(task.id, { status }).subscribe({ next: () => this.reload() });
   }
 
-  onCategoryAdded(request: { name: string; description?: string }) {
-    this.categoryService.create(request).subscribe({
-      next: () => this.reloadCategories(),
-    });
+  onCategoryAdded() {
+    this.reloadCategories();
+  }
+
+  onCategoryEdited() {
+    this.reloadCategories();
   }
 
   onCategoryDeleted(id: string) {
-    this.categoryService.delete(id).subscribe({
-      next: () => {
-        this.reloadCategories();
-        if (this.selectedCategoryId === id)
-          this.onCategorySelected({ id: null, name: 'All Tasks' });
-      },
-    });
+    this.reloadCategories();
+    if (this.selectedCategoryId === id) {
+      this.onCategorySelected({ id: null, name: 'All Tasks' });
+    }
   }
 
   private patchFilter(patch: Partial<TaskFilterModel>) {
@@ -146,6 +148,8 @@ export class TasksComponent implements OnInit {
   }
 
   private reloadCategories() {
-    this.categories$ = this.categoryService.getAll().pipe(shareReplay(1));
+    this.categoryService.getAll().subscribe({
+      next: (categories) => this.categoriesSubject.next(categories),
+    });
   }
 }

@@ -7,8 +7,9 @@
         [categories]="categories"
         [selectedCategoryId]="selectedCategoryId"
         (categorySelected)="onCategorySelected($event)"
-        (categoryAdded)="onCategoryAdded($event)"
+        (categoryAdded)="onCategoryAdded()"
         (categoryDeleted)="onCategoryDeleted($event)"
+        (categoryEdited)="onCategoryEdited()"
       />
     }
 

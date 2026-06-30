@@ -28,7 +28,9 @@ export class AuthService {
   }
 
   revoke(refreshToken: string): Observable<void> {
-    return this.http.post<void>(`${this.apiUrl}/revoke`, refreshToken);
+    return this.http.post<void>(`${this.apiUrl}/revoke`, JSON.stringify(refreshToken), {
+      headers: { 'Content-Type': 'application/json' },
+    });
   }
 
   saveTokens(response: AuthResponse): void {

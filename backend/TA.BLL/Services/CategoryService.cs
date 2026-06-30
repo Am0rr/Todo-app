@@ -52,7 +52,8 @@ public class CategoryService : BaseService, ICategoryService
 
         if (request.Name != null)
         {
-            if (await _unitOfWork.Categories.Query().AnyAsync(c => c.Name == request.Name && c.UserId == userId && c.Id == id, cancellationToken))
+            Console.WriteLine($"Checking name='{request.Name}', userId={userId}, excludingId={id}");
+            if (await _unitOfWork.Categories.Query().AnyAsync(c => c.Name == request.Name && c.UserId == userId && c.Id != id, cancellationToken))
                 throw new ConflictException($"A category with the name '{request.Name}' already exists.");
 
             category.ChangeName(request.Name);
