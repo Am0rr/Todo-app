@@ -8,7 +8,7 @@
     (click)="$event.stopPropagation(); toggleStatus.emit(task)"
     class="w-5 h-5 accent-blue-600"
   />
-  <div class="flex-1">
+  <div class="flex-1 min-w-0">
     <p
       class="font-medium"
       [class.line-through]="task.status === 'Done'"
@@ -16,7 +16,7 @@
     >
       {{ task.title }}
     </p>
-    <p class="text-sm text-gray-500">{{ task.description }}</p>
+    <p class="text-sm text-gray-500 truncate">{{ task.description }}</p>
   </div>
   <span
     class="text-xs px-2 py-1 rounded-full"
