@@ -14,7 +14,8 @@ public class MappingProfile : Profile
         CreateMap<User, UserResponse>()
             .ForMember(dest => dest.Role, opt => opt.MapFrom(src => src.Role.ToString()));
 
-        CreateMap<Category, CategoryResponse>();
+        CreateMap<Category, CategoryResponse>()
+            .ForMember(dest => dest.TaskCount, opt => opt.MapFrom(src => src.Tasks.Count()));
 
         CreateMap<TaskItem, TaskResponse>()
             .ForMember(dest => dest.Status, opt => opt.MapFrom(src => src.Status.ToString()));

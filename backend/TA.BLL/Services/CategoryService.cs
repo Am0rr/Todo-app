@@ -99,6 +99,7 @@ public class CategoryService : BaseService, ICategoryService
         else
             categories = await _unitOfWork.Categories.Query()
                 .Where(c => c.UserId == userId)
+                .Include(c => c.Tasks)
                 .ToListAsync(cancellationToken);
 
         return _mapper.Map<IEnumerable<CategoryResponse>>(categories);
