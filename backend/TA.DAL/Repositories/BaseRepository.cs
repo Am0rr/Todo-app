@@ -14,7 +14,7 @@ public class BaseRepository<T>(AppDbContext context) : IBaseRepository<T> where 
         return await _dbSet.FirstOrDefaultAsync(t => t.Id == id, cancellationToken);
     }
 
-    public async Task<IEnumerable<T>> GetAllAsync(CancellationToken cancellationToken)
+    public virtual async Task<IEnumerable<T>> GetAllAsync(CancellationToken cancellationToken)
     {
         return await _dbSet.AsNoTracking().ToListAsync(cancellationToken);
     }
