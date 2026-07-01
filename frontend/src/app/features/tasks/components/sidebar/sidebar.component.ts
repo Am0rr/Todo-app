@@ -22,8 +22,11 @@ import { CategoryService } from '../../../../core/services/category.service';
 export class SidebarComponent {
   @Input({ required: true }) categories!: CategoryResponse[];
   @Input() selectedCategoryId: string | null = null;
-
-  @Output() categorySelected = new EventEmitter<{ id: string | null; name: string }>();
+  @Output() categorySelected = new EventEmitter<{
+    id: string | null;
+    name: string;
+    description?: string;
+  }>();
   @Output() categoryAdded = new EventEmitter<void>();
   @Output() categoryDeleted = new EventEmitter<string>();
   @Output() categoryEdited = new EventEmitter<void>();
@@ -39,21 +42,38 @@ export class SidebarComponent {
 
   showAddCategoryModal = false;
   newCategory = { name: '', description: '' };
-
   addCategoryError = '';
   editCategoryError = '';
   deleteCategoryError = '';
-
   showEditCategoryModal = false;
   editingCategory: CategoryResponse | null = null;
   editCategory = { name: '', description: '' };
 
+  private extractErrorMessage(err: any, fallback: string): string {
+    const errors = err?.error?.errors;
+    if (errors) {
+      const firstKey = Object.keys(errors)[0];
+      const firstMessage = firstKey ? errors[firstKey]?.[0] : undefined;
+      if (firstMessage) return firstMessage;
+    }
+    return err?.error?.title ?? err?.error?.message ?? fallback;
+  }
+
   onAddCategory() {
+    const name = this.newCategory.name.trim();
+
+    if (!name) {
+      this.addCategoryError = 'Category name cannot be empty.';
+      this.cdr.markForCheck();
+      return;
+    }
+
     this.addCategoryError = '';
+
     this.categoryService
       .create({
-        name: this.newCategory.name,
-        description: this.newCategory.description || undefined,
+        name,
+        description: this.newCategory.description.trim() || undefined,
       })
       .subscribe({
         next: () => {
@@ -62,20 +82,29 @@ export class SidebarComponent {
           this.categoryAdded.emit();
         },
         error: (err) => {
-          this.addCategoryError =
-            err.error?.errors?.[0] ?? err.error?.message ?? 'Failed to create category.';
+          this.addCategoryError = this.extractErrorMessage(err, 'Failed to create category.');
+          this.cdr.markForCheck();
         },
       });
   }
 
   onEditCategory() {
     if (!this.editingCategory) return;
+
+    const name = this.editCategory.name.trim();
+
+    if (!name) {
+      this.editCategoryError = 'Category name cannot be empty.';
+      this.cdr.markForCheck();
+      return;
+    }
+
     this.editCategoryError = '';
 
     this.categoryService
       .update(this.editingCategory.id, {
-        name: this.editCategory.name,
-        description: this.editCategory.description || undefined,
+        name,
+        description: this.editCategory.description.trim() || undefined,
       })
       .subscribe({
         next: () => {
@@ -83,8 +112,7 @@ export class SidebarComponent {
           this.categoryEdited.emit();
         },
         error: (err) => {
-          this.editCategoryError =
-            err.error?.errors?.[0] ?? err.error?.message ?? 'Failed to update category.';
+          this.editCategoryError = this.extractErrorMessage(err, 'Failed to update category.');
           this.cdr.markForCheck();
         },
       });
@@ -95,7 +123,8 @@ export class SidebarComponent {
     this.categoryService.delete(id).subscribe({
       next: () => this.categoryDeleted.emit(id),
       error: (err) => {
-        alert(err.error?.message ?? 'Failed to delete category.');
+        alert(this.extractErrorMessage(err, 'Failed to delete category.'));
+        this.cdr.markForCheck();
       },
     });
   }
@@ -104,6 +133,7 @@ export class SidebarComponent {
     this.editingCategory = category;
     this.editCategory = { name: category.name, description: category.description ?? '' };
     this.showEditCategoryModal = true;
+    this.cdr.markForCheck();
   }
 
   closeEditCategoryModal() {

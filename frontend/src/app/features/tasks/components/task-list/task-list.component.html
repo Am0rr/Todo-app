@@ -12,7 +12,9 @@
 </div>
 
 @if (pagedResult.totalPages > 1) {
-  <div class="bg-white border-t border-gray-200 px-6 py-3 flex items-center justify-center gap-2">
+  <div
+    class="h-16 bg-white border-t border-gray-200 px-6 flex items-center justify-center gap-2 shrink-0"
+  >
     <button
       (click)="pageChange.emit(pagedResult.pageNumber - 1)"
       [disabled]="pagedResult.pageNumber === 1"

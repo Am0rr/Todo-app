@@ -42,6 +42,8 @@ export class TasksComponent implements OnInit {
   private filterSubject = new BehaviorSubject<TaskFilterModel>({ pageNumber: 1, pageSize: 10 });
   private categoriesSubject = new BehaviorSubject<CategoryResponse[]>([]);
 
+  selectedCategoryDescription: string | null = null;
+
   constructor(
     private taskService: TaskService,
     private categoryService: CategoryService,
@@ -57,9 +59,10 @@ export class TasksComponent implements OnInit {
     );
   }
 
-  onCategorySelected(event: { id: string | null; name: string }) {
+  onCategorySelected(event: { id: string | null; name: string; description?: string }) {
     this.selectedCategoryId = event.id;
     this.selectedCategoryName = event.name;
+    this.selectedCategoryDescription = event.description ?? null;
     this.patchFilter({ categoryId: event.id ?? undefined, pageNumber: 1 });
   }
 
@@ -127,7 +130,16 @@ export class TasksComponent implements OnInit {
   }
 
   onCategoryEdited() {
-    this.reloadCategories();
+    this.categoryService.getAll().subscribe({
+      next: (categories) => {
+        this.categoriesSubject.next(categories);
+        const updated = categories.find((c) => c.id === this.selectedCategoryId);
+        if (updated) {
+          this.selectedCategoryName = updated.name;
+          this.selectedCategoryDescription = updated.description ?? null;
+        }
+      },
+    });
   }
 
   onCategoryDeleted(id: string) {

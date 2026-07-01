@@ -12,6 +12,10 @@
           placeholder="Task title"
           class="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
         />
+
+        @if (error) {
+          <p class="text-red-500 text-sm mb-3">{{ error }}</p>
+        }
       </div>
 
       <div class="mb-4">
@@ -52,10 +56,6 @@
           <option value="Done">Done</option>
         </select>
       </div>
-
-      @if (error) {
-        <p class="text-red-500 text-sm mb-3">{{ error }}</p>
-      }
 
       <div class="flex gap-3 justify-end">
         <button
