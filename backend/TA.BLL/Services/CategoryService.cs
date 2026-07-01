@@ -75,6 +75,12 @@ public class CategoryService : BaseService, ICategoryService
         if (userId != category.UserId && !HasGlobalAccess(role))
             throw new ForbiddenException("You are not allowed to access this category.");
 
+        var hasTasks = await _unitOfWork.Tasks.Query()
+            .AnyAsync(t => t.CategoryId == id, cancellationToken);
+
+        if (hasTasks)
+            throw new ConflictException("Cannot delete a category that has tasks assigned to it.");
+
         _unitOfWork.Categories.Delete(category);
         await _unitOfWork.SaveChangesAsync(cancellationToken);
     }
