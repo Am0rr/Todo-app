@@ -67,9 +67,6 @@ The backend follows an **N-Tier architecture** with 4 conceptual layers:
 ### Tasks Search
 ![Serach Task](docs/screenshots/search.png)
 
-### Categories
-![Categories](docs/screenshots/categories.png)
-
 ## Getting Started
 
 ### Prerequisites
